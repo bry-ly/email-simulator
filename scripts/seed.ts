@@ -1,10 +1,11 @@
-import { writeFileSync, readFileSync, existsSync } from "fs";
+import { writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 
 const DATA_DIR = join(process.cwd(), "data");
 
 function writeJson(filename: string, data: unknown, subdir?: string) {
 	const dir = subdir ? join(DATA_DIR, subdir) : DATA_DIR;
+	mkdirSync(dir, { recursive: true });
 	writeFileSync(join(dir, filename), JSON.stringify(data, null, 2));
 }
 
