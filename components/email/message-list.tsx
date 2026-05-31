@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Message } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,34 +44,43 @@ interface MessageListProps {
 export function MessageList({ email, folder, title }: MessageListProps) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+	const [permanentDeleteTarget, setPermanentDeleteTarget] = useState<string | null>(null);
 
-	useEffect(() => {
-		fetchMessages();
-	}, [email, folder]);
-
-	async function fetchMessages() {
+	const fetchMessages = useCallback(async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
 				`/api/messages?email=${encodeURIComponent(email)}&folder=${folder}`
 			);
+			if (!res.ok) {
+				throw new Error(`API error: ${res.status}`);
+			}
 			const data = await res.json();
-			setMessages(data);
+			if (Array.isArray(data)) {
+				setMessages(data);
+			}
 		} catch {
 			console.error("Failed to fetch messages");
 		} finally {
 			setLoading(false);
 		}
-	}
+	}, [email, folder]);
+
+	useEffect(() => {
+		fetchMessages();
+	}, [fetchMessages]);
 
 	async function handleDelete(messageId: string) {
+		setDeleteTarget(null);
 		try {
 			const { moveToTrashAction } = await import("@/actions/message.actions");
 			await moveToTrashAction(email, messageId);
 			toast.success("Message moved to trash");
-			fetchMessages();
+			setMessages((prev) => prev.filter((m) => m.id !== messageId));
 		} catch {
 			toast.error("Failed to delete message");
+			fetchMessages();
 		}
 	}
 
@@ -80,20 +89,23 @@ export function MessageList({ email, folder, title }: MessageListProps) {
 			const { restoreFromTrashAction } = await import("@/actions/message.actions");
 			await restoreFromTrashAction(email, messageId);
 			toast.success("Message restored");
-			fetchMessages();
+			setMessages((prev) => prev.filter((m) => m.id !== messageId));
 		} catch {
 			toast.error("Failed to restore message");
+			fetchMessages();
 		}
 	}
 
 	async function handlePermanentDelete(messageId: string) {
+		setPermanentDeleteTarget(null);
 		try {
 			const { permanentDeleteAction } = await import("@/actions/message.actions");
 			await permanentDeleteAction(email, messageId);
 			toast.success("Message permanently deleted");
-			fetchMessages();
+			setMessages((prev) => prev.filter((m) => m.id !== messageId));
 		} catch {
 			toast.error("Failed to delete message");
+			fetchMessages();
 		}
 	}
 
@@ -168,12 +180,21 @@ export function MessageList({ email, folder, title }: MessageListProps) {
 													>
 														<HugeiconsIcon icon={ArchiveRestoreIcon} strokeWidth={2} className="size-3.5" />
 													</Button>
-													<AlertDialog>
-														<AlertDialogTrigger
-															render={
-																<Button size="icon-xs" variant="ghost" />
-															}
-														>
+												<AlertDialog
+													open={permanentDeleteTarget === msg.id}
+													onOpenChange={(open) => {
+														if (!open) setPermanentDeleteTarget(null);
+													}}
+												>
+													<AlertDialogTrigger
+														render={
+															<Button
+																size="icon-xs"
+																variant="ghost"
+																onClick={() => setPermanentDeleteTarget(msg.id)}
+															/>
+														}
+													>
 															<HugeiconsIcon icon={Delete01Icon} strokeWidth={2} className="size-3.5 text-destructive" />
 														</AlertDialogTrigger>
 														<AlertDialogContent>
@@ -203,10 +224,19 @@ export function MessageList({ email, folder, title }: MessageListProps) {
 														</Button>
 													</Link>
 													{folder !== "drafts" && (
-													<AlertDialog>
+													<AlertDialog
+														open={deleteTarget === msg.id}
+														onOpenChange={(open) => {
+															if (!open) setDeleteTarget(null);
+														}}
+													>
 														<AlertDialogTrigger
 															render={
-																<Button size="icon-xs" variant="ghost" />
+																<Button
+																	size="icon-xs"
+																	variant="ghost"
+																	onClick={() => setDeleteTarget(msg.id)}
+																/>
 															}
 														>
 																<HugeiconsIcon icon={Delete01Icon} strokeWidth={2} className="size-3.5 text-muted-foreground" />

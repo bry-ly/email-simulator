@@ -28,9 +28,23 @@ export function StatsBar({ email }: StatsBarProps) {
 	const [counts, setCounts] = useState<FolderCounts | null>(null);
 
 	useEffect(() => {
-		fetch(`/api/messages/counts?email=${encodeURIComponent(email)}`)
-			.then((res) => res.json())
-			.then(setCounts);
+		async function fetchCounts() {
+			try {
+				const res = await fetch(
+					`/api/messages/counts?email=${encodeURIComponent(email)}`
+				);
+				if (res.ok) {
+					const data = await res.json();
+					setCounts(data);
+				}
+			} catch {
+				// silent
+			}
+		}
+
+		fetchCounts();
+		const interval = setInterval(fetchCounts, 3000);
+		return () => clearInterval(interval);
 	}, [email]);
 
 	if (!counts) return null;

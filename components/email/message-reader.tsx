@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Message } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, Delete01Icon, MailReply01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -35,12 +36,10 @@ interface MessageReaderProps {
 export function MessageReader({ email, messageId }: MessageReaderProps) {
 	const [message, setMessage] = useState<Message | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const router = useRouter();
 
-	useEffect(() => {
-		fetchMessage();
-	}, [email, messageId]);
-
-	async function fetchMessage() {
+	const fetchMessage = useCallback(async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
@@ -49,10 +48,10 @@ export function MessageReader({ email, messageId }: MessageReaderProps) {
 			if (res.ok) {
 				const data = await res.json();
 				setMessage(data);
-				// Mark as read if inbox
 				if (data.folder === "inbox" && !data.read) {
 					const { markAsReadAction } = await import("@/actions/message.actions");
 					await markAsReadAction(email, messageId);
+					setMessage({ ...data, read: true });
 				}
 			}
 		} catch {
@@ -60,14 +59,19 @@ export function MessageReader({ email, messageId }: MessageReaderProps) {
 		} finally {
 			setLoading(false);
 		}
-	}
+	}, [email, messageId]);
+
+	useEffect(() => {
+		fetchMessage();
+	}, [fetchMessage]);
 
 	async function handleDelete() {
+		setDeleteDialogOpen(false);
 		try {
 			const { moveToTrashAction } = await import("@/actions/message.actions");
 			await moveToTrashAction(email, messageId);
 			toast.success("Message moved to trash");
-			window.location.href = `/dashboard/inbox`;
+			router.push(`/dashboard/inbox`);
 		} catch {
 			toast.error("Failed to delete message");
 		}
@@ -116,10 +120,17 @@ export function MessageReader({ email, messageId }: MessageReaderProps) {
 								<HugeiconsIcon icon={MailReply01Icon} strokeWidth={2} className="size-4" />
 							</Button>
 						)}
-						<AlertDialog>
+						<AlertDialog
+							open={deleteDialogOpen}
+							onOpenChange={setDeleteDialogOpen}
+						>
 							<AlertDialogTrigger
 								render={
-									<Button size="icon-sm" variant="ghost" />
+									<Button
+										size="icon-sm"
+										variant="ghost"
+										onClick={() => setDeleteDialogOpen(true)}
+									/>
 								}
 							>
 								<HugeiconsIcon icon={Delete01Icon} strokeWidth={2} className="size-4 text-muted-foreground" />
