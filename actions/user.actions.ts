@@ -3,5 +3,5 @@
 import { getUsers } from "@/lib/users";
 
 export async function getUsersAction() {
-	return getUsers();
+	return await getUsers();
 }

@@ -2,25 +2,26 @@
 
 import type { Message } from "@/types";
 import {
-	getMessagesByEmail,
 	getMessagesByFolder,
 	getMessageById,
 	saveMessage,
 	updateMessage,
+	deleteMessage,
 	getUnreadCount,
 	getFolderCounts,
 } from "@/lib/messages";
 import { addLog } from "@/lib/logs";
+import { revalidatePath } from "next/cache";
 
 export async function getMessagesAction(
 	email: string,
 	folder: Message["folder"]
 ) {
-	return getMessagesByFolder(email, folder);
+	return await getMessagesByFolder(email, folder);
 }
 
 export async function getMessageAction(email: string, messageId: string) {
-	return getMessageById(email, messageId);
+	return await getMessageById(email, messageId);
 }
 
 export async function sendMessageAction(
@@ -30,10 +31,9 @@ export async function sendMessageAction(
 	body: string
 ) {
 	const now = new Date().toISOString();
-	const id = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
 	const outboxMessage: Message = {
-		id,
+		id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
 		from: fromEmail,
 		to: toEmail,
 		subject,
@@ -45,54 +45,64 @@ export async function sendMessageAction(
 	};
 
 	const inboxMessage: Message = {
-		...outboxMessage,
+		id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+		from: fromEmail,
+		to: toEmail,
+		subject,
+		body,
+		timestamp: now,
 		read: false,
 		folder: "inbox",
+		labels: [],
 	};
 
-	saveMessage(fromEmail, outboxMessage);
-	saveMessage(toEmail, inboxMessage);
+	await saveMessage(fromEmail, outboxMessage);
+	await saveMessage(toEmail, inboxMessage);
 
-	addLog({
+	await addLog({
 		action: "sent",
-		messageId: id,
+		messageId: outboxMessage.id,
 		userId: fromEmail,
 		details: `Sent to ${toEmail}: ${subject}`,
 	});
 
-	addLog({
+	await addLog({
 		action: "received",
-		messageId: id,
+		messageId: inboxMessage.id,
 		userId: toEmail,
 		details: `Received from ${fromEmail}: ${subject}`,
 	});
+
+	revalidatePath("/dashboard");
 
 	return outboxMessage;
 }
 
 export async function markAsReadAction(email: string, messageId: string) {
-	const msg = updateMessage(email, messageId, { read: true });
+	const msg = await updateMessage(email, messageId, { read: true });
 	if (msg) {
-		addLog({
+		await addLog({
 			action: "read",
 			messageId,
 			userId: email,
 			details: `Read: ${msg.subject}`,
 		});
 	}
+	revalidatePath("/dashboard");
 	return msg;
 }
 
 export async function moveToTrashAction(email: string, messageId: string) {
-	const msg = updateMessage(email, messageId, { folder: "trash" });
+	const msg = await updateMessage(email, messageId, { folder: "trash" });
 	if (msg) {
-		addLog({
+		await addLog({
 			action: "deleted",
 			messageId,
 			userId: email,
 			details: `Trashed: ${msg.subject}`,
 		});
 	}
+	revalidatePath("/dashboard");
 	return msg;
 }
 
@@ -100,17 +110,17 @@ export async function restoreFromTrashAction(
 	email: string,
 	messageId: string
 ) {
-	return updateMessage(email, messageId, { folder: "inbox" });
+	const msg = await updateMessage(email, messageId, { folder: "inbox" });
+	revalidatePath("/dashboard");
+	return msg;
 }
 
 export async function permanentDeleteAction(
 	email: string,
 	messageId: string
 ) {
-	const messages = getMessagesByEmail(email);
-	const filtered = messages.filter((m) => m.id !== messageId);
-	const { writeJson } = await import("@/lib/storage");
-	writeJson(`${email}.json`, filtered, "messages");
+	await deleteMessage(messageId);
+	revalidatePath("/dashboard");
 	return { success: true };
 }
 
@@ -132,7 +142,8 @@ export async function saveDraftAction(
 		folder: "drafts",
 		labels: [],
 	};
-	saveMessage(email, draft);
+	await saveMessage(email, draft);
+	revalidatePath("/dashboard");
 	return draft;
 }
 
