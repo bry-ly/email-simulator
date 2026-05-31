@@ -8,6 +8,7 @@ import {
 	Delete01Icon,
 	File01Icon,
 	Clock01Icon,
+	InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
 
 export type SidebarNavItem = {
@@ -61,6 +62,16 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Activity Logs",
 				path: "/dashboard/logs",
 				icon: <HugeiconsIcon icon={Clock01Icon} strokeWidth={2} />,
+			},
+		],
+	},
+	{
+		label: "Info",
+		items: [
+			{
+				title: "About",
+				path: "/dashboard/about",
+				icon: <HugeiconsIcon icon={InformationCircleIcon} strokeWidth={2} />,
 			},
 		],
 	},
