@@ -1,0 +1,13 @@
+[
+  {
+    "id": "msg-7",
+    "from": "alice@sim.mail",
+    "to": "charlie@sim.mail",
+    "subject": "Welcome!",
+    "body": "Welcome to the team Charlie! Let me know if you need help getting set up.",
+    "timestamp": "2026-05-26T00:38:51.138Z",
+    "read": true,
+    "folder": "inbox",
+    "labels": []
+  }
+]

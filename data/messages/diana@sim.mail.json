@@ -1,0 +1,13 @@
+[
+  {
+    "id": "msg-8",
+    "from": "bob@sim.mail",
+    "to": "diana@sim.mail",
+    "subject": "Re: Bug Report",
+    "body": "Thanks for reporting this Diana! I'll fix it in the next sprint.",
+    "timestamp": "2026-05-31T00:38:51.138Z",
+    "read": true,
+    "folder": "outbox",
+    "labels": []
+  }
+]

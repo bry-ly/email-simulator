@@ -1,0 +1,57 @@
+[
+  {
+    "id": "msg-1",
+    "from": "bob@sim.mail",
+    "to": "alice@sim.mail",
+    "subject": "Project Update",
+    "body": "Hey Alice, just wanted to let you know the project is on track. We should be ready for the demo next week.\n\nBest,\nBob",
+    "timestamp": "2026-05-30T00:38:51.138Z",
+    "read": true,
+    "folder": "trash",
+    "labels": []
+  },
+  {
+    "id": "msg-2",
+    "from": "alice@sim.mail",
+    "to": "bob@sim.mail",
+    "subject": "Re: Project Update",
+    "body": "Thanks Bob! I'll prepare the slides for the demo. Let me know if you need anything else.",
+    "timestamp": "2026-05-30T00:38:51.138Z",
+    "read": true,
+    "folder": "outbox",
+    "labels": []
+  },
+  {
+    "id": "msg-3",
+    "from": "charlie@sim.mail",
+    "to": "alice@sim.mail",
+    "subject": "Meeting Tomorrow",
+    "body": "Hi Alice, are we still meeting tomorrow at 2pm? I have a few things to discuss.",
+    "timestamp": "2026-05-29T00:38:51.138Z",
+    "read": true,
+    "folder": "trash",
+    "labels": []
+  },
+  {
+    "id": "msg-4",
+    "from": "alice@sim.mail",
+    "to": "charlie@sim.mail",
+    "subject": "Re: Meeting Tomorrow",
+    "body": "Yes, 2pm works for me. See you then!",
+    "timestamp": "2026-05-29T00:38:51.138Z",
+    "read": true,
+    "folder": "outbox",
+    "labels": []
+  },
+  {
+    "id": "msg-1780188951579-ew6ydps",
+    "from": "alice@sim.mail",
+    "to": "bob@sim.mail",
+    "subject": "test",
+    "body": "12345678",
+    "timestamp": "2026-05-31T00:55:51.579Z",
+    "read": true,
+    "folder": "trash",
+    "labels": []
+  }
+]

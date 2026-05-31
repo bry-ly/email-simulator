@@ -1,0 +1,162 @@
+[
+  {
+    "id": "log-1",
+    "action": "sent",
+    "messageId": "msg-2",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-30T00:38:51.138Z",
+    "details": "Sent to bob@sim.mail: Re: Project Update"
+  },
+  {
+    "id": "log-2",
+    "action": "received",
+    "messageId": "msg-1",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-30T00:38:51.138Z",
+    "details": "Received from bob@sim.mail: Project Update"
+  },
+  {
+    "id": "log-3",
+    "action": "sent",
+    "messageId": "msg-4",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-29T00:38:51.138Z",
+    "details": "Sent to charlie@sim.mail: Re: Meeting Tomorrow"
+  },
+  {
+    "id": "log-4",
+    "action": "received",
+    "messageId": "msg-3",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-29T00:38:51.138Z",
+    "details": "Received from charlie@sim.mail: Meeting Tomorrow"
+  },
+  {
+    "id": "log-5",
+    "action": "sent",
+    "messageId": "msg-5",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-28T00:38:51.138Z",
+    "details": "Sent to bob@sim.mail: New Feature Request"
+  },
+  {
+    "id": "log-6",
+    "action": "received",
+    "messageId": "msg-6",
+    "userId": "bob@sim.mail",
+    "timestamp": "2026-05-31T00:38:51.138Z",
+    "details": "Received from diana@sim.mail: Bug Report"
+  },
+  {
+    "id": "log-7",
+    "action": "sent",
+    "messageId": "msg-8",
+    "userId": "diana@sim.mail",
+    "timestamp": "2026-05-31T00:38:51.138Z",
+    "details": "Sent to bob@sim.mail: Re: Bug Report"
+  },
+  {
+    "id": "log-8",
+    "action": "received",
+    "messageId": "msg-7",
+    "userId": "charlie@sim.mail",
+    "timestamp": "2026-05-26T00:38:51.138Z",
+    "details": "Received from alice@sim.mail: Welcome!"
+  },
+  {
+    "id": "log-9",
+    "action": "read",
+    "messageId": "msg-1",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-31T00:38:51.138Z",
+    "details": "Read: Project Update"
+  },
+  {
+    "id": "log-10",
+    "action": "read",
+    "messageId": "msg-3",
+    "userId": "alice@sim.mail",
+    "timestamp": "2026-05-30T00:38:51.138Z",
+    "details": "Read: Meeting Tomorrow"
+  },
+  {
+    "action": "read",
+    "messageId": "msg-1",
+    "userId": "alice@sim.mail",
+    "details": "Read: Project Update",
+    "id": "log-1780188602333-li4s9vp",
+    "timestamp": "2026-05-31T00:50:02.333Z"
+  },
+  {
+    "action": "read",
+    "messageId": "msg-1",
+    "userId": "alice@sim.mail",
+    "details": "Read: Project Update",
+    "id": "log-1780188602483-gq74e4m",
+    "timestamp": "2026-05-31T00:50:02.484Z"
+  },
+  {
+    "action": "deleted",
+    "messageId": "msg-1",
+    "userId": "alice@sim.mail",
+    "details": "Trashed: Project Update",
+    "id": "log-1780188718210-nxmtbsr",
+    "timestamp": "2026-05-31T00:51:58.210Z"
+  },
+  {
+    "action": "deleted",
+    "messageId": "msg-3",
+    "userId": "alice@sim.mail",
+    "details": "Trashed: Meeting Tomorrow",
+    "id": "log-1780188719363-3jfmffb",
+    "timestamp": "2026-05-31T00:51:59.363Z"
+  },
+  {
+    "action": "sent",
+    "messageId": "msg-1780188951579-ew6ydps",
+    "userId": "alice@sim.mail",
+    "details": "Sent to bob@sim.mail: test",
+    "id": "log-1780188951582-618ons6",
+    "timestamp": "2026-05-31T00:55:51.582Z"
+  },
+  {
+    "action": "received",
+    "messageId": "msg-1780188951579-ew6ydps",
+    "userId": "bob@sim.mail",
+    "details": "Received from alice@sim.mail: test",
+    "id": "log-1780188951583-f3qlfh7",
+    "timestamp": "2026-05-31T00:55:51.583Z"
+  },
+  {
+    "action": "read",
+    "messageId": "msg-1780188951579-ew6ydps",
+    "userId": "bob@sim.mail",
+    "details": "Read: test",
+    "id": "log-1780189032843-4261a5u",
+    "timestamp": "2026-05-31T00:57:12.843Z"
+  },
+  {
+    "action": "read",
+    "messageId": "msg-1780188951579-ew6ydps",
+    "userId": "bob@sim.mail",
+    "details": "Read: test",
+    "id": "log-1780189032989-dggd3sw",
+    "timestamp": "2026-05-31T00:57:12.989Z"
+  },
+  {
+    "action": "deleted",
+    "messageId": "msg-1780188951579-ew6ydps",
+    "userId": "bob@sim.mail",
+    "details": "Trashed: test",
+    "id": "log-1780189039539-na0hxfz",
+    "timestamp": "2026-05-31T00:57:19.539Z"
+  },
+  {
+    "action": "deleted",
+    "messageId": "msg-1780188951579-ew6ydps",
+    "userId": "alice@sim.mail",
+    "details": "Trashed: test",
+    "id": "log-1780190470355-tdo2223",
+    "timestamp": "2026-05-31T01:21:10.355Z"
+  }
+]
