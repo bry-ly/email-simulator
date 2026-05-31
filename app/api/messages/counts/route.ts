@@ -8,5 +8,5 @@ export async function GET(request: NextRequest) {
 		return NextResponse.json({ error: "email is required" }, { status: 400 });
 	}
 
-	return NextResponse.json(getFolderCounts(email));
+	return NextResponse.json(await getFolderCounts(email));
 }

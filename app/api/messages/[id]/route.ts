@@ -12,7 +12,7 @@ export async function GET(
 		return NextResponse.json({ error: "email is required" }, { status: 400 });
 	}
 
-	const message = getMessageById(email, id);
+	const message = await getMessageById(email, id);
 	if (!message) {
 		return NextResponse.json({ error: "Message not found" }, { status: 404 });
 	}

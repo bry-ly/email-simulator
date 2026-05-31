@@ -13,6 +13,7 @@ export default function MessagePage() {
 
 	return (
 		<MessageReader
+			key={messageId}
 			email={currentUser.email}
 			messageId={messageId}
 		/>

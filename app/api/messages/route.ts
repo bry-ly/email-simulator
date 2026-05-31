@@ -13,6 +13,6 @@ export async function GET(request: NextRequest) {
 	}
 
 	return NextResponse.json(
-		getMessagesByFolder(email, folder as "inbox" | "outbox" | "drafts" | "trash")
+		await getMessagesByFolder(email, folder as "inbox" | "outbox" | "drafts" | "trash")
 	);
 }
