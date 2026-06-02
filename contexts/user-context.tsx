@@ -1,53 +1,51 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import type { User } from "@/types";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 interface UserContextValue {
 	currentUser: User | null;
-	users: User[];
 	setCurrentUser: (user: User) => void;
+	refreshUser: () => Promise<void>;
 	logout: () => void;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
-	const [currentUser, setCurrentUserState] = useState<User | null>(null);
-	const [users, setUsers] = useState<User[]>([]);
+export function UserProvider({
+	children,
+	initialUser,
+}: {
+	children: React.ReactNode;
+	initialUser: User | null;
+}) {
+	const [currentUser, setCurrentUserState] = useState<User | null>(initialUser);
 
-	useEffect(() => {
-		fetch("/api/users")
-			.then((res) => res.json())
-			.then((data: User[]) => {
-				setUsers(data);
-				const savedId = localStorage.getItem("currentUserId");
-				const found = data.find((u) => u.id === savedId);
-				if (found) {
-					setCurrentUserState(found);
-				} else if (data.length > 0) {
-					setCurrentUserState(data[0]);
-					localStorage.setItem("currentUserId", data[0].id);
-				}
-			});
+	const setCurrentUser = useCallback((user: User) => setCurrentUserState(user), []);
+
+	const refreshUser = useCallback(async () => {
+		const { data } = await authClient.getSession();
+		if (!data?.user) return;
+		setCurrentUserState({
+			id: data.user.id,
+			name: data.user.name,
+			email: data.user.email,
+			avatarColor: (data.user as { avatarColor?: string }).avatarColor ?? "#6366f1",
+		});
 	}, []);
 
-	function setCurrentUser(user: User) {
-		setCurrentUserState(user);
-		localStorage.setItem("currentUserId", user.id);
-	}
-
-	function logout() {
+	async function logout() {
 		const name = currentUser?.name ?? "User";
+		await authClient.signOut();
 		setCurrentUserState(null);
-		localStorage.removeItem("currentUserId");
 		toast.success(`Logged out — See you, ${name}!`);
 		window.location.href = "/login";
 	}
 
 	return (
-		<UserContext.Provider value={{ currentUser, users, setCurrentUser, logout }}>
+		<UserContext.Provider value={{ currentUser, setCurrentUser, refreshUser, logout }}>
 			{children}
 		</UserContext.Provider>
 	);
