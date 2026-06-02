@@ -22,6 +22,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
 	BellIcon,
 	BrushIcon,
+	Clock01Icon,
 	ComputerIcon,
 	InformationCircleIcon,
 	Key01Icon,
@@ -30,6 +31,7 @@ import {
 import { AvatarPicker } from "@/components/settings/avatar-picker";
 import { SessionsList } from "@/components/settings/sessions-list";
 import { DangerZone } from "@/components/settings/danger-zone";
+import { ActivityLog } from "@/components/logs/activity-log";
 import { useNotificationPreference } from "@/hooks/use-notification-preference";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +40,7 @@ interface SettingsDialogProps {
 	onOpenChange: (open: boolean) => void;
 }
 
-type Tab = "profile" | "account" | "appearance" | "notifications" | "sessions" | "about";
+type Tab = "profile" | "account" | "appearance" | "notifications" | "sessions" | "logs" | "about";
 
 const TABS: { id: Tab; label: string; icon: typeof UserCircleIcon }[] = [
 	{ id: "profile", label: "Profile", icon: UserCircleIcon },
@@ -46,6 +48,7 @@ const TABS: { id: Tab; label: string; icon: typeof UserCircleIcon }[] = [
 	{ id: "appearance", label: "Appearance", icon: BrushIcon },
 	{ id: "notifications", label: "Notifications", icon: BellIcon },
 	{ id: "sessions", label: "Sessions", icon: ComputerIcon },
+	{ id: "logs", label: "Logs", icon: Clock01Icon },
 	{ id: "about", label: "About", icon: InformationCircleIcon },
 ];
 
@@ -349,6 +352,20 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 								</header>
 								<Separator />
 								<SessionsList />
+							</section>
+						)}
+
+						{tab === "logs" && (
+							<section className="space-y-6">
+								<header>
+									<h2 className="font-semibold text-lg">Activity logs</h2>
+									<p className="text-muted-foreground text-sm">
+										Recent activity for your account, including sends, reads, and
+										deletes.
+									</p>
+								</header>
+								<Separator />
+								<ActivityLog userId={currentUser.email} />
 							</section>
 						)}
 
