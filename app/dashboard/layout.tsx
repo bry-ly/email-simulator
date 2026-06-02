@@ -4,6 +4,7 @@ import { UserProvider } from "@/contexts/user-context";
 import { ShortcutsProvider } from "@/components/layout/shortcuts-provider";
 import { SettingsProvider } from "@/contexts/settings-context";
 import { ComposeProvider } from "@/contexts/compose-context";
+import { RouteTransition } from "@/components/layout/route-transition";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -32,7 +33,9 @@ export default async function DashboardLayout({
 			<SettingsProvider>
 				<ComposeProvider>
 					<ShortcutsProvider>
-						<AppShell>{children}</AppShell>
+						<AppShell>
+							<RouteTransition>{children}</RouteTransition>
+						</AppShell>
 					</ShortcutsProvider>
 				</ComposeProvider>
 			</SettingsProvider>

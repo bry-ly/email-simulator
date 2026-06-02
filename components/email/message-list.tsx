@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
+import { ViewTransition } from "react";
 import type { Message } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,16 +74,20 @@ export function MessageList({ email, folder, title, initialMessages }: MessageLi
 	const someSelected = selected.size > 0 && !allSelected;
 
 	function toggleOne(id: string) {
-		setSelected((prev) => {
-			const next = new Set(prev);
-			if (next.has(id)) next.delete(id);
-			else next.add(id);
-			return next;
+		startTransition(() => {
+			setSelected((prev) => {
+				const next = new Set(prev);
+				if (next.has(id)) next.delete(id);
+				else next.add(id);
+				return next;
+			});
 		});
 	}
 
 	function toggleAll() {
-		setSelected(allSelected ? new Set() : new Set(messages.map((m) => m.id)));
+		startTransition(() => {
+			setSelected(allSelected ? new Set() : new Set(messages.map((m) => m.id)));
+		});
 	}
 
 	async function bulkTrash() {
@@ -106,7 +111,7 @@ export function MessageList({ email, folder, title, initialMessages }: MessageLi
 		setLoading(true);
 		try {
 			const data = await getMessagesAction(email, folder);
-			setMessages(data);
+			startTransition(() => setMessages(data));
 		} catch {
 			toast.error("Failed to load messages");
 		} finally {
@@ -227,25 +232,27 @@ export function MessageList({ email, folder, title, initialMessages }: MessageLi
 					<Badge variant="secondary">{messages.length}</Badge>
 				</CardTitle>
 				<div className="flex items-center gap-2">
-					{selected.size > 0 && folder !== "trash" && (
-						<Button
-							size="sm"
-							variant="outline"
-							onClick={bulkTrash}
-							disabled={bulkBusy}
-						>
-							Move {selected.size} to trash
-						</Button>
-					)}
-					{selected.size > 0 && (
-						<Button
-							size="sm"
-							variant="ghost"
-							onClick={() => setSelected(new Set())}
-						>
-							Clear
-						</Button>
-					)}
+					<ViewTransition enter="slide-down" exit="slide-up" default="none">
+						{selected.size > 0 && folder !== "trash" && (
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={bulkTrash}
+								disabled={bulkBusy}
+							>
+								Move {selected.size} to trash
+							</Button>
+						)}
+						{selected.size > 0 && (
+							<Button
+								size="sm"
+								variant="ghost"
+								onClick={() => startTransition(() => setSelected(new Set()))}
+							>
+								Clear
+							</Button>
+						)}
+					</ViewTransition>
 					{folder === "inbox" && messages.some((m) => !m.read) && (
 						<Button size="sm" variant="ghost" onClick={handleMarkAllRead}>
 							Mark all as read
@@ -292,10 +299,10 @@ export function MessageList({ email, folder, title, initialMessages }: MessageLi
 						</TableHeader>
 						<TableBody>
 							{messages.map((msg) => (
-								<TableRow
-									key={msg.id}
-									className={`h-14 ${!msg.read && folder === "inbox" ? "font-semibold" : ""} ${selected.has(msg.id) ? "bg-muted/50" : ""}`}
-								>
+								<ViewTransition key={msg.id} default="none" enter="auto" exit="auto">
+									<TableRow
+										className={`h-14 ${!msg.read && folder === "inbox" ? "font-semibold" : ""} ${selected.has(msg.id) ? "bg-muted/50" : ""}`}
+									>
 									<TableCell className="w-10 pl-6">
 										<input
 											type="checkbox"
@@ -309,12 +316,14 @@ export function MessageList({ email, folder, title, initialMessages }: MessageLi
 										{folder === "outbox" || folder === "drafts" ? msg.to : msg.from}
 									</TableCell>
 									<TableCell className="max-w-48">
-										<Link
-											href={`/dashboard/message/${msg.id}`}
-											className="line-clamp-1 text-sm hover:underline"
-										>
-											{msg.subject || "(No subject)"}
-										</Link>
+										<ViewTransition name={`msg-subject-${msg.id}`} share="morph-message" default="none">
+											<Link
+												href={`/dashboard/message/${msg.id}`}
+												className="line-clamp-1 text-sm hover:underline"
+											>
+												{msg.subject || "(No subject)"}
+											</Link>
+										</ViewTransition>
 									</TableCell>
 									<TableCell className="hidden text-muted-foreground text-sm sm:table-cell">
 										{formatDate(msg.timestamp)}
@@ -411,7 +420,8 @@ export function MessageList({ email, folder, title, initialMessages }: MessageLi
 											)}
 										</div>
 									</TableCell>
-								</TableRow>
+									</TableRow>
+								</ViewTransition>
 							))}
 						</TableBody>
 					</Table>

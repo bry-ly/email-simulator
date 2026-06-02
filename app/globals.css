@@ -128,3 +128,79 @@
     @apply font-sans;
   }
 }
+
+/* === View Transition animations === */
+@layer utilities {
+  /* List identity — smooth row reorder/enter/exit */
+  ::view-transition-group(*) {
+    animation-duration: 240ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* Shared element — subject morphs from list row to reader header */
+  ::view-transition-old(morph-message),
+  ::view-transition-new(morph-message) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  ::view-transition-old(morph-message) {
+    animation-name: vt-fade-out;
+  }
+  ::view-transition-new(morph-message) {
+    animation-name: vt-fade-in;
+  }
+
+  /* Bulk-action toolbar — slide down/up */
+  ::view-transition-old(slide-up),
+  ::view-transition-new(slide-down) {
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  ::view-transition-old(slide-up) {
+    animation-name: vt-slide-up-out;
+  }
+  ::view-transition-new(slide-down) {
+    animation-name: vt-slide-down-in;
+  }
+
+  /* Folder route cross-fade */
+  ::view-transition-old(route-fade),
+  ::view-transition-new(route-fade) {
+    animation-duration: 180ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  ::view-transition-old(route-fade) {
+    animation-name: vt-fade-out;
+  }
+  ::view-transition-new(route-fade) {
+    animation-name: vt-fade-in;
+  }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes vt-slide-down-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vt-slide-up-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

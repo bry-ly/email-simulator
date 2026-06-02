@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { ViewTransition } from "react";
 import type { Message } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -161,7 +162,9 @@ export function MessageReader({ email, messageId, initialMessage }: MessageReade
 						<Button size="icon-sm" variant="ghost" nativeButton={false} render={<Link href={`/dashboard/${message.folder}`} />}>
 							<HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} className="size-4" />
 						</Button>
-						<h2 className="font-semibold text-lg">{message.subject}</h2>
+						<ViewTransition name={`msg-subject-${message.id}`} share="morph-message" default="none">
+							<h2 className="font-semibold text-lg">{message.subject}</h2>
+						</ViewTransition>
 						{message.folder === "inbox" && !message.read && (
 							<Badge variant="secondary">New</Badge>
 						)}
