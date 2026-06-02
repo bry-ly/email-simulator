@@ -1,48 +1,38 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { User } from "@/types";
+import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { UserProvider } from "@/contexts/user-context";
+import { ShortcutsProvider } from "@/components/layout/shortcuts-provider";
+import { SettingsProvider } from "@/contexts/settings-context";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const router = useRouter();
-	const [ready, setReady] = useState(false);
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
 
-	useEffect(() => {
-		const userId = localStorage.getItem("currentUserId");
-		if (!userId) {
-			router.push("/login");
-			return;
-		}
-		fetch("/api/users")
-			.then((res) => res.json())
-			.then((data: User[]) => {
-				const found = data.find((u) => u.id === userId);
-				if (!found) {
-					router.push("/login");
-					return;
-				}
-				setReady(true);
-			});
-	}, [router]);
-
-	if (!ready) {
-		return (
-			<div className="flex min-h-screen items-center justify-center">
-				<p className="text-muted-foreground text-sm">Loading...</p>
-			</div>
-		);
+	if (!session) {
+		redirect("/login");
 	}
 
+	const user = {
+		id: session.user.id,
+		name: session.user.name,
+		email: session.user.email,
+		avatarColor: (session.user as { avatarColor?: string }).avatarColor ?? "#6366f1",
+	};
+
 	return (
-		<UserProvider>
-			<AppShell>{children}</AppShell>
+		<UserProvider initialUser={user}>
+			<ShortcutsProvider>
+				<SettingsProvider>
+					<AppShell>{children}</AppShell>
+				</SettingsProvider>
+			</ShortcutsProvider>
 		</UserProvider>
 	);
 }

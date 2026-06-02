@@ -1,17 +1,16 @@
 import "dotenv/config";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { messages, messageLogs, user } from "../lib/db/schema";
+import { eq } from "drizzle-orm";
+import { messages, messageLogs, user, account } from "../lib/db/schema";
+import { auth } from "../lib/auth";
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql);
 
 const PALETTE = ["#6366f1", "#ec4899", "#10b981", "#f59e0b", "#06b6d4"];
 
-const now = new Date();
-function daysAgo(d: number) {
-	return new Date(now.getTime() - d * 86400000);
-}
+const DEMO_PASSWORD = "password1234";
 
 const seedUsers = [
 	{ id: "u_alice", name: "Alice", email: "alice@sim.mail", avatarColor: PALETTE[0] },
@@ -44,26 +43,60 @@ const seedLogs = [
 	{ id: "log-10", action: "read" as const, messageId: "msg-3", userId: "alice@sim.mail", timestamp: daysAgo(1), details: "Read: Meeting Tomorrow" },
 ];
 
+const now = new Date();
+function daysAgo(d: number) {
+	return new Date(now.getTime() - d * 86400000);
+}
+
+async function ensureUser(u: typeof seedUsers[number]) {
+	const existing = await db
+		.select({ id: user.id })
+		.from(user)
+		.where(eq(user.email, u.email));
+
+	if (existing.length > 0) {
+		await db
+			.update(user)
+			.set({ name: u.name, avatarColor: u.avatarColor })
+			.where(eq(user.email, u.email));
+		return existing[0].id;
+	}
+
+	const result = await auth.api.signUpEmail({
+		body: {
+			name: u.name,
+			email: u.email,
+			password: DEMO_PASSWORD,
+		},
+	});
+
+	if (!result || ("error" in result && result.error)) {
+		const raw =
+			"error" in result && result.error ? String(result.error) : "Unknown error";
+		throw new Error(`Failed to sign up ${u.email}: ${raw}`);
+	}
+
+	const created = await db
+		.select({ id: user.id })
+		.from(user)
+		.where(eq(user.email, u.email));
+	if (created.length === 0) {
+		throw new Error(`User ${u.email} not found after sign up`);
+	}
+	return created[0].id;
+}
+
 async function seed() {
 	console.log("Seeding database...");
 
 	await db.delete(messageLogs);
 	await db.delete(messages);
+	await db.delete(account);
+	await db.delete(user);
 
 	for (const u of seedUsers) {
-		await db
-			.insert(user)
-			.values({
-				id: u.id,
-				name: u.name,
-				email: u.email,
-				emailVerified: true,
-				avatarColor: u.avatarColor,
-			})
-			.onConflictDoUpdate({
-				target: user.email,
-				set: { avatarColor: u.avatarColor },
-			});
+		await ensureUser(u);
+		console.log(`  user: ${u.email} (password: ${DEMO_PASSWORD})`);
 	}
 	console.log(`Seeded ${seedUsers.length} users`);
 
@@ -74,6 +107,8 @@ async function seed() {
 	console.log(`Seeded ${seedLogs.length} logs`);
 
 	console.log("Done!");
+	console.log(`\nDemo accounts (password: ${DEMO_PASSWORD}):`);
+	for (const u of seedUsers) console.log(`  - ${u.email}`);
 }
 
 seed().catch((err) => {
