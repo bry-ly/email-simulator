@@ -1,22 +1,24 @@
 import "dotenv/config";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { users, messages, messageLogs } from "../lib/db/schema";
+import { messages, messageLogs, user } from "../lib/db/schema";
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql);
 
-const seedUsers = [
-	{ id: "alice", name: "Alice Johnson", email: "alice@sim.mail", avatarColor: "#6366f1" },
-	{ id: "bob", name: "Bob Smith", email: "bob@sim.mail", avatarColor: "#f59e0b" },
-	{ id: "charlie", name: "Charlie Lee", email: "charlie@sim.mail", avatarColor: "#10b981" },
-	{ id: "diana", name: "Diana Park", email: "diana@sim.mail", avatarColor: "#ec4899" },
-];
+const PALETTE = ["#6366f1", "#ec4899", "#10b981", "#f59e0b", "#06b6d4"];
 
 const now = new Date();
 function daysAgo(d: number) {
 	return new Date(now.getTime() - d * 86400000);
 }
+
+const seedUsers = [
+	{ id: "u_alice", name: "Alice", email: "alice@sim.mail", avatarColor: PALETTE[0] },
+	{ id: "u_bob", name: "Bob", email: "bob@sim.mail", avatarColor: PALETTE[1] },
+	{ id: "u_charlie", name: "Charlie", email: "charlie@sim.mail", avatarColor: PALETTE[2] },
+	{ id: "u_diana", name: "Diana", email: "diana@sim.mail", avatarColor: PALETTE[3] },
+];
 
 const seedMessages = [
 	{ id: "msg-1", from: "bob@sim.mail", to: "alice@sim.mail", subject: "Project Update", body: "Hey Alice, just wanted to let you know the project is on track. We should be ready for the demo next week.\n\nBest,\nBob", timestamp: daysAgo(1), read: false, folder: "inbox" as const, labels: [] as string[] },
@@ -47,9 +49,22 @@ async function seed() {
 
 	await db.delete(messageLogs);
 	await db.delete(messages);
-	await db.delete(users);
 
-	await db.insert(users).values(seedUsers);
+	for (const u of seedUsers) {
+		await db
+			.insert(user)
+			.values({
+				id: u.id,
+				name: u.name,
+				email: u.email,
+				emailVerified: true,
+				avatarColor: u.avatarColor,
+			})
+			.onConflictDoUpdate({
+				target: user.email,
+				set: { avatarColor: u.avatarColor },
+			});
+	}
 	console.log(`Seeded ${seedUsers.length} users`);
 
 	await db.insert(messages).values(seedMessages);
