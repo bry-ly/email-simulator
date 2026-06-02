@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { UserProvider } from "@/contexts/user-context";
 import { ShortcutsProvider } from "@/components/layout/shortcuts-provider";
 import { SettingsProvider } from "@/contexts/settings-context";
+import { ComposeProvider } from "@/contexts/compose-context";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -29,9 +30,11 @@ export default async function DashboardLayout({
 	return (
 		<UserProvider initialUser={user}>
 			<SettingsProvider>
-				<ShortcutsProvider>
-					<AppShell>{children}</AppShell>
-				</ShortcutsProvider>
+				<ComposeProvider>
+					<ShortcutsProvider>
+						<AppShell>{children}</AppShell>
+					</ShortcutsProvider>
+				</ComposeProvider>
 			</SettingsProvider>
 		</UserProvider>
 	);

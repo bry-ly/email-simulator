@@ -5,7 +5,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
 	InboxIcon,
 	MailSend01Icon,
-	PencilEdit01Icon,
 	Delete01Icon,
 	File01Icon,
 	Tag01Icon,
@@ -41,11 +40,6 @@ function buildGroups(unread: number, drafts: number, labels: string[]): SidebarN
 					title: "Outbox",
 					path: "/dashboard/outbox",
 					icon: <HugeiconsIcon icon={MailSend01Icon} strokeWidth={2} />,
-				},
-				{
-					title: "Compose",
-					path: "/dashboard/compose",
-					icon: <HugeiconsIcon icon={PencilEdit01Icon} strokeWidth={2} />,
 				},
 				{
 					title: "Drafts",

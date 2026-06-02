@@ -28,10 +28,18 @@ export function useKeyboardShortcuts(map: ShortcutMap, enabled = true) {
 	}, [map, enabled]);
 }
 
-export function useGlobalShortcuts(onOpenSettings: () => void) {
+export interface GlobalShortcutsOptions {
+	onOpenSettings: () => void;
+	onOpenCompose: () => void;
+}
+
+export function useGlobalShortcuts({
+	onOpenSettings,
+	onOpenCompose,
+}: GlobalShortcutsOptions) {
 	const router = useRouter();
 	useKeyboardShortcuts({
-		c: () => router.push("/dashboard/compose"),
+		c: onOpenCompose,
 		g: () => router.push("/dashboard/inbox"),
 		",": onOpenSettings,
 		"?": onOpenSettings,

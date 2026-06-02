@@ -1,7 +1,6 @@
 "use client";
 
 import { LogoIcon } from "@/components/logo";
-import { Button } from "@/components/ui/button";
 import {
 	Sidebar,
 	SidebarContent,
@@ -13,12 +12,18 @@ import {
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavGroup } from "@/components/nav-group";
-import { navGroups } from "@/components/app-shared";
+import { useNavGroups } from "@/components/app-shared";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { PencilEdit01Icon } from "@hugeicons/core-free-icons";
+import { PencilEdit01Icon, Settings01Icon } from "@hugeicons/core-free-icons";
+import { useSettingsDialog } from "@/contexts/settings-context";
+import { useComposeDialog } from "@/contexts/compose-context";
 import Link from "next/link";
 
 export function AppSidebar() {
+	const groups = useNavGroups();
+	const settings = useSettingsDialog();
+	const compose = useComposeDialog();
+
 	return (
 		<Sidebar collapsible="icon" variant="inset">
 			<SidebarHeader className="h-14 justify-center">
@@ -31,24 +36,30 @@ export function AppSidebar() {
 				<SidebarGroup>
 					<SidebarMenuItem>
 						<SidebarMenuButton
-							className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+							className="min-w-8 cursor-pointer bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
 							tooltip="Compose"
-							render={<Link href="/dashboard/compose" />}
+							onClick={() => compose.open()}
 						>
 							<HugeiconsIcon icon={PencilEdit01Icon} strokeWidth={2} />
 							<span>Compose</span>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarGroup>
-				{navGroups.map((group, index) => (
+				{groups.map((group, index) => (
 					<NavGroup key={`sidebar-group-${index}`} {...group} />
 				))}
 			</SidebarContent>
 			<SidebarFooter>
 				<SidebarMenu className="mt-2">
 					<SidebarMenuItem>
-						<SidebarMenuButton className="text-muted-foreground" size="sm" render={<a href="#" />}>
-							<span>SimMail v1.0</span>
+						<SidebarMenuButton
+							className="cursor-pointer text-muted-foreground"
+							size="sm"
+							tooltip="Settings"
+							onClick={settings.open}
+						>
+							<HugeiconsIcon icon={Settings01Icon} strokeWidth={2} />
+							<span>Settings</span>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
