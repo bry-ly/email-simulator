@@ -28,11 +28,11 @@ export default async function DashboardLayout({
 
 	return (
 		<UserProvider initialUser={user}>
-			<ShortcutsProvider>
-				<SettingsProvider>
+			<SettingsProvider>
+				<ShortcutsProvider>
 					<AppShell>{children}</AppShell>
-				</SettingsProvider>
-			</ShortcutsProvider>
+				</ShortcutsProvider>
+			</SettingsProvider>
 		</UserProvider>
 	);
 }
