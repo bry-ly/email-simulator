@@ -18,9 +18,13 @@ export async function listSessionsAction(): Promise<SessionRow[]> {
 }
 
 export async function revokeSessionAction(token: string) {
-	await auth.api.revokeSession({
-		headers: await headers(),
-		body: { token },
-	});
-	return { ok: true } as const;
+	try {
+		await auth.api.revokeSession({
+			headers: await headers(),
+			body: { token },
+		});
+		return { ok: true } as const;
+	} catch (e) {
+		return { error: e instanceof Error ? e.message : "Failed to revoke" } as const;
+	}
 }
